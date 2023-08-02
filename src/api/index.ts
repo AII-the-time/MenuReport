@@ -6,6 +6,26 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
         return {data:'pong'};
     });
 
+    server.get<
+    {
+        Params: {
+            userId: string;
+        }
+    }
+    >('/load/:userId', async (req, res) => {
+        const { userId } = req.params;
+        const prisma = new PrismaClient();
+        const user = await prisma.user.findUnique({
+            where: {
+                uuid: userId,
+            },
+        });
+        if (!user) {
+            return res.code(404).send();
+        }
+        return JSON.parse(user.data);
+    });
+
     server.post<
     {
         Body: {
