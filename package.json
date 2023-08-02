@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx watch src src/index.ts",
-    "build": "cd front&&npm run build"
+    "build": "cd front&&npm run build",
+    "prisma": "./prisma/concat_schema.sh && prisma migrate dev --name init --preview-feature"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "prisma": "^5.1.0",
     "ts-jest": "^29.1.1",
     "tsx": "^3.12.7",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "uuid": "^9.0.0"
   }
 }
