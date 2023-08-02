@@ -18,3 +18,4 @@ build
 coverage
 migrations
 schema.prisma
+src/public
