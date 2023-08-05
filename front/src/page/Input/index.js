@@ -45,6 +45,8 @@ const OptionList = styled.table``;
 const Amount = styled.span`
   padding: 5px;
 `;
+const RecipeInput = styled.div``;
+const Btn = styled.button``;
 
 export default function App() {
   return (
@@ -113,25 +115,29 @@ export default function App() {
           <ChooseOption>
             <Option>
               <OptionList>
-                <tr>
+                <td>
                   <Input type="checkbox" />
-                  에티오피아
-                </tr>
-                <tr>
+                  음료용
+                </td>
+                <td>
                   <Input type="checkbox" />
-                  콜롬비아
-                </tr>
-                <tr>
+                  디저트 박스
+                </td>
+                <td>
                   <Input type="checkbox" />
                   사용안함
-                </tr>
+                </td>
               </OptionList>
             </Option>
-            <Amount>
-              <Input />g
-            </Amount>
           </ChooseOption>
         </PreInput>
+        <RecipeInput>
+          <Input />
+          <Amount>
+            <Input />g
+          </Amount>
+        </RecipeInput>
+        <Btn>추가</Btn>
       </MenuRecipe>
     </div>
   );
