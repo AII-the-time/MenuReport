@@ -1,6 +1,6 @@
 import {Link, useSearchParams} from 'react-router-dom';
 import styled from 'styled-components';
-import {ContentsWrapper,ButtonCSS,Title} from '../../component';
+import {ContentsWrapper,ButtonCSS,Title} from '../../components';
 
 const LinkButton = styled(Link)`
     ${ButtonCSS}

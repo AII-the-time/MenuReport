@@ -6,7 +6,7 @@ import Input from './page/Input';
 import Start from './page/Start';
 import Result from './page/Result';
 import PreInput from './page/PreInput';
-import Header from './component/Header';
+import Header from './components/Header';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
