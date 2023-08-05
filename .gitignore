@@ -17,5 +17,4 @@ node_modules
 build
 coverage
 migrations
-schema.prisma
 src/public
