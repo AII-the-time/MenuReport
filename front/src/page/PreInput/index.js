@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
-import {redirect, useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import {useSearchParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {ContentsWrapper,ButtonCSS,InputCSS, Title} from '../../component';
+import axios from 'axios';
 
 const LinkButton = styled.button`
     ${ButtonCSS}
@@ -81,42 +82,43 @@ const Label = styled.label`
     }
 `;
 
-const Wondu = () => (
+const Wondu = ({name,weight,price,setWondu}) => (
     <InputWrapper>
-        <Input type="text" maxlength="10" placeholder="원두 이름"/>
+        <Input type="text" maxLength="10" placeholder="원두 이름" name="wonduName" defaultValue={name} onChange={(e)=>{setWondu('name',e.target.value)}}/>
         <InputWithUnit>
-            <Input type="text" placeholder="용량(g)" />
+            <Input type="text" placeholder="용량(g)" name="wonduWeight" defaultValue={weight} onChange={(e)=>{setWondu('weight',e.target.value)}}/>
             <span>g</span>
         </InputWithUnit>
         <InputWithUnit>
-            <Input type="text" placeholder="가격(원)" />
+            <Input type="text" placeholder="가격(원)" name="wonduPrice" defaultValue={price} onChange={(e)=>{setWondu('price',e.target.value)}}/>
             <span>원</span>
         </InputWithUnit>
     </InputWrapper>
 );
 
-const Milk = () => (
+const Milk = ({name,weight,price,setMilk}) => (
     <InputWrapper>
+        <Input type="text" maxLength="10" placeholder="우유 종류(우유, 두유, 저지방 등)" name="milkName" defaultValue={name} onChange={(e)=>{setMilk('name',e.target.value)}}/>
         <InputWithUnit>
-            <Input type="text" placeholder="용량(ml)" />
+            <Input type="text" placeholder="용량(ml)" name="milkWeight" defaultValue={weight} onChange={(e)=>{setMilk('weight',e.target.value)}}/>
             <span>ml</span>
         </InputWithUnit>
         <InputWithUnit>
-            <Input type="text" placeholder="가격(원)" />
+            <Input type="text" placeholder="가격(원)" name="milkPrice" defaultValue={price} onChange={(e)=>{setMilk('price',e.target.value)}}/>
             <span>원</span>
         </InputWithUnit>
     </InputWrapper>
 );
 
-const Pojangjae = () => (
+const Pojangjae = ({name,count,price,setPojangjae}) => (
     <InputWrapper>
-        <Input type="text" maxlength="10" placeholder="포장재 이름"/>
+        <Input type="text" maxLength="10" placeholder="포장재 이름" name="pojangjaeName" defaultValue={name} onChange={(e)=>{setPojangjae('name',e.target.value)}}/>
         <InputWithUnit>
-            <Input type="text" placeholder="개수(개)" />
+            <Input type="text" placeholder="개수(개)" name="pojangjaeCount" defaultValue={count} onChange={(e)=>{setPojangjae('count',e.target.value)}}/>
             <span>개</span>
         </InputWithUnit>
         <InputWithUnit>
-            <Input type="text" placeholder="가격(원)" />
+            <Input type="text" placeholder="가격(원)" name="pojangjaePrice" defaultValue={price} onChange={(e)=>{setPojangjae('price',e.target.value)}}/>
             <span>원</span>
         </InputWithUnit>
     </InputWrapper>
@@ -124,15 +126,54 @@ const Pojangjae = () => (
 
 export default function(){
     const [searchParams] = useSearchParams();
+    const [loading, setLoading] = useState(true);
     const [nextLoding, setNextLoading] = useState(false);
-    const [wondu, setWondu] = useState(1);
-    const [pojangjae, setPojangjae] = useState(1);
+    const [wondu, setWondu] = useState([]);
+    const [milk, setMilk] = useState([]);
+    const [pojangjae, setPojangjae] = useState([]);
     const navigate = useNavigate();
     const formRef = useRef();
-    const onClick = (e) => {
+
+    useEffect(() => {
+        const setDefault = async () => {
+            const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
+            if(!response.data){
+                setWondu([{name:'',weight:'',price:''}]);
+                setMilk([{name:'',weight:'',price:''}]);
+                setPojangjae([{name:'',count:'',price:''}]);
+                setLoading(false);
+                return;
+            }
+            setWondu(response.data.wondu);
+            setMilk(response.data.milk);
+            setPojangjae(response.data.pojangjae);
+            setLoading(false);
+        }
+        setDefault();
+    },[]);
+
+    const onClick = async (e) => {
         e.preventDefault();
         setNextLoading(true);
+        const formData = new FormData(formRef.current);
+        const data = {};
+        for(let [key, value] of formData.entries()){
+            data[key]? data[key].push(value) : data[key] = [value];
+        }
+        const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
+        const requestData = {
+            userId: searchParams.get('userId'),
+            data:{
+                ...response.data,
+                wondu: wondu,
+                milk: milk,
+                pojangjae: pojangjae
+            }
+        };
+        
+        console.log(requestData);
 
+        await axios.post('/api/user/save', requestData);
         navigate(`/Input?userId=${searchParams.get('userId')}`);
     }
 
@@ -156,21 +197,40 @@ export default function(){
                     </div>
                 </Label>
                 {
-                    [...Array(wondu)].map((_,i) => <Wondu key={i}/>)
+                    wondu.map((_, i) =>
+                        <Wondu key={i} name={_.name} weight={_.weight} price={_.price}
+                            setWondu={(name,value)=>{
+                                const newWondu = [...wondu];
+                                newWondu[i][name] = value;
+                                setWondu(newWondu);
+                            }}
+                        />
+                    )
                 }
-                <PlusButton onClick={(e) => {e.preventDefault(); setWondu(wondu + 1)}}>+ 원두 추가하기</PlusButton>
+                <PlusButton onClick={(e) => {e.preventDefault(); setWondu([...wondu,{name:'',weight:'',price:''}])}}>+ 원두 추가하기</PlusButton>
                 <Label>
                     우유
                     <div className="material-icons">
                         help_outline
                         <div>
+                            <span>우유 종류: </span>
+                            <span>알아보기 쉬운 이름으로</span>
                             <span>용량과 가격: </span>
                             <span>해당 용량에 대한 가격</span>
                             <span style={{gridColumn:"2/3", fontSize:"0.8rem"}}>ex) 1L에 10,000원이면 1000ml와 10000을 입력해주세요.</span>
                         </div>
                     </div>
                 </Label>
-                <Milk/>
+                {
+                    milk.map((_,i) => <Milk key={i} name={_.name} weight={_.weight} price={_.price}
+                        setMilk={(name,value)=>{
+                            const newMilk = [...milk];
+                            newMilk[i][name] = value;
+                            setMilk(newMilk);
+                        }}
+                    />)
+                }
+                <PlusButton onClick={(e) => {e.preventDefault(); setMilk([...milk,{name:'',weight:'',price:''}])}}>+ 우유 추가하기</PlusButton>
                 <div style={{height:"25px"}}></div>
                 <Label>
                     포장재
@@ -186,10 +246,16 @@ export default function(){
                     </div>
                 </Label>
                 {
-                    [...Array(pojangjae)].map((_,i) => <Pojangjae key={i}/>)
+                    pojangjae.map((_,i) => <Pojangjae key={i} name={_.name} count={_.count} price={_.price}
+                        setPojangjae={(name,value)=>{
+                            const newPojangjae = [...pojangjae];
+                            newPojangjae[i][name] = value;
+                            setPojangjae(newPojangjae);
+                        }
+                    }/>)
                 }
-                <PlusButton onClick={(e) => {e.preventDefault(); setPojangjae(pojangjae + 1)}}>+ 포장재 추가하기</PlusButton>
-                <LinkButton onClick={nextLoding ? null : onClick} type="submit">
+                <PlusButton onClick={(e) => {e.preventDefault(); setPojangjae([...pojangjae,{name:'',count:'',price:''}])}}>+ 포장재 추가하기</PlusButton>
+                <LinkButton onClick={nextLoding ? (e)=>{e.preventDefault()} : onClick} type="submit">
                     {nextLoding ? '메뉴 불러오는 중...' : '다음으로'}
                 </LinkButton>
             </form>
