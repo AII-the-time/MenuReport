@@ -8,7 +8,7 @@ export const ContentsWrapper = styled.div`
     justify-content: center;
     gap: 10px;
     align-items: start;
-    padding: 30px 10px 0 10px;
+    padding: 10px 10px 0 10px;
     max-width: 600px;
 `;
 
