@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import InputComponent from "./InputComponent";
-import FindMaterial from "./components/FindMaterial";
+import FindMaterial from "./FindMaterial";
 
 class RecipeComponet extends Component {
   constructor(props) {

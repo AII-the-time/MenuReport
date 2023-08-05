@@ -2,14 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
-import App from './App';
+import Input from './page/Input';
+import Start from './page/Start';
+import Result from './page/Result';
+import PreInput from './page/PreInput';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<Start />} />
+        <Route path="/PreInput" element={<PreInput />} />
+        <Route path="/Input" element={<Input />} />
+        <Route path="/Result" element={<Result />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

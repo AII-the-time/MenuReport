@@ -1,7 +1,7 @@
 import { useRef,useState,useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import {ReactComponent as AddIcon} from "../add_circle.svg";
+import {ReactComponent as AddIcon} from "./add_circle.svg";
 
 const Search = styled.div`
     width: 100%;

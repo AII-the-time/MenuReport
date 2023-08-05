@@ -1,5 +1,6 @@
 import "./App.css";
 import AllRecipeContainer from "./Recipe1";
+import { Link } from "react-router-dom";
 
 function App() {
   return (
@@ -7,7 +8,7 @@ function App() {
       <AllRecipeContainer />
       <div class="btn_area">
         <button type="button" className="btnactive">
-          <span>레포트 만들기!</span>
+          <Link to="/Result">레포트 만들기!</Link>
         </button>
       </div>
     </div>
