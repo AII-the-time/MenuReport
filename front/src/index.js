@@ -6,11 +6,13 @@ import Input from './page/Input';
 import Start from './page/Start';
 import Result from './page/Result';
 import PreInput from './page/PreInput';
+import Header from './component/Header';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
+      <Header />
       <Routes>
         <Route path="/" element={<Start />} />
         <Route path="/PreInput" element={<PreInput />} />
