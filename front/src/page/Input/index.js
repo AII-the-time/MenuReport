@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {useSearchParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styled from 'styled-components';
 import { ContentsWrapper } from '../../components';
-import { LinkButton, PlusButton,TwoInputWithLabel, LabelWithTooltip } from './components';
+import { LinkButton, PlusButton,TwoInputWithLabel,SelectAndInput, LabelWithTooltip } from './components';
 
 const PreInput = styled.div`
   display: flex;
@@ -24,11 +25,71 @@ const RecipeInput = styled.div``;
 const Btn = styled.button``;
 
 export default function App() {
+  const [searchParams] = useSearchParams();
+  const [loading, setLoading] = useState(true);
   const [nextLoding, setNextLoding] = useState(false);
+  const [menu, setMenu] = useState([]);
+  const [wonduKind, setWonduKind] = useState([]);
+  const [milkKind, setMilkKind] = useState([]);
+  const [pojangjaeKind, setPojangjaeKind] = useState([]);
+  const navigate = useNavigate();
 
-  const onClick = () => {
+  useEffect(() => {
+    const setDefault = async () => {
+      try {
+        const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
+        if(!response.data){
+          window.location.href = '/?userId='+searchParams.get('userId');
+          return;
+        }
+        setWonduKind(response.data.wondu);
+        setMilkKind(response.data.milk);
+        setPojangjaeKind(response.data.pojangjae);
+        if (!response.data.menu) {
+          setMenu([{
+            menuName: '',
+            menuPrice: '',
+            wondu: {name:'사용안함',weight:''},
+            milk: {name:'사용안함',weight:''},
+            pojangjae: [],
+            recipe: [],
+          }]);
+          setLoading(false);
+          return;
+        }
+        setMenu(response.data.menu);
+        setLoading(false);
+      } catch (e) {
+        window.location.reload();
+      }
+    };
+    setDefault();
+  }, []);
+
+  const onClick = async (e) => {
+    e.preventDefault();
     setNextLoding(true);
+    try{
+      const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
+      const requestData = {
+        userId: searchParams.get('userId'),
+        data:{
+          ...response.data,
+          menu: menu
+        }
+      };
+      console.log(requestData);
+      await axios.post('/api/user/save', requestData);
+    }catch(e){
+      setNextLoding(false);
+      alert('저장에 실패했습니다. 다시 시도해주세요.');
+      return;
+    }
+    navigate(`/Input?userId=${searchParams.get('userId')}`);
   };
+
+  if (loading) return <ContentsWrapper>로딩중...</ContentsWrapper>;
+
   return (
     <ContentsWrapper>
       <TwoInputWithLabel>
@@ -44,75 +105,46 @@ export default function App() {
           </div>
         </div>
       </TwoInputWithLabel>
-      <PreInput>
-        원두
-        <ChooseOption>
-          <Option>
-            <OptionList>
-              <tr>
-                <Input type="checkbox" />
-                에티오피아
-              </tr>
-              <tr>
-                <Input type="checkbox" />
-                콜롬비아
-              </tr>
-              <tr>
-                <Input type="checkbox" />
-                사용안함
-              </tr>
-            </OptionList>
-          </Option>
-          <Amount>
-            <Input />g
-          </Amount>
-        </ChooseOption>
-      </PreInput>
-      <PreInput>
-        우유
-        <ChooseOption>
-          <Option>
-            <OptionList>
-              <tr>
-                <Input type="checkbox" />
-                에티오피아
-              </tr>
-              <tr>
-                <Input type="checkbox" />
-                콜롬비아
-              </tr>
-              <tr>
-                <Input type="checkbox" />
-                사용안함
-              </tr>
-            </OptionList>
-          </Option>
-          <Amount>
-            <Input />g
-          </Amount>
-        </ChooseOption>
-      </PreInput>
-      <PreInput>
-        포장재
-        <ChooseOption>
-          <Option>
-            <OptionList>
-              <td>
-                <Input type="checkbox" />
-                음료용
-              </td>
-              <td>
-                <Input type="checkbox" />
-                디저트 박스
-              </td>
-              <td>
-                <Input type="checkbox" />
-                사용안함
-              </td>
-            </OptionList>
-          </Option>
-        </ChooseOption>
-      </PreInput>
+      <SelectAndInput>
+        <label>원두</label>
+        <div>
+          {[...wonduKind,{name:'사용안함'}].map((item, index) => (
+            <div key={index}>
+              {item.name}
+            </div>
+          ))}
+        </div>
+        <div>
+          <label>1회 사용량</label>
+          <input name="wonduWeight" type="number" />
+          <span>g</span>
+        </div>
+      </SelectAndInput>
+      <SelectAndInput>
+        <label>우유</label>
+        <div>
+          {[...milkKind,{name:'사용안함'}].map((item, index) => (
+            <div key={index}>
+              {item.name}
+            </div>
+          ))}
+        </div>
+        <div>
+          <label>1회 사용량</label>
+          <input name="milkWeight" type="number" />
+          <span>ml</span>
+        </div>
+      </SelectAndInput>
+      <SelectAndInput>
+        <label>포장재</label>
+        <div>
+          {pojangjaeKind.map((item, index) => (
+            <div key={index}>
+              {item.name}
+            </div>
+          ))}
+        </div>
+      </SelectAndInput>
       <RecipeInput>
         <Input />
         <Amount>

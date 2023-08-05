@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {useSearchParams, useNavigate } from 'react-router-dom';
 import {ContentsWrapper, Title} from '../../components';
 import { LinkButton, PlusButton, Label, Wondu, Milk, Pojangjae } from './components';
@@ -12,7 +12,6 @@ export default function(){
     const [milk, setMilk] = useState([]);
     const [pojangjae, setPojangjae] = useState([]);
     const navigate = useNavigate();
-    const formRef = useRef();
 
     useEffect(() => {
         const setDefault = async () => {
@@ -39,11 +38,6 @@ export default function(){
     const onClick = async (e) => {
         e.preventDefault();
         setNextLoading(true);
-        const formData = new FormData(formRef.current);
-        const data = {};
-        for(let [key, value] of formData.entries()){
-            data[key]? data[key].push(value) : data[key] = [value];
-        }
         try{
             const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
             const requestData = {
@@ -67,14 +61,14 @@ export default function(){
         navigate(`/Input?userId=${searchParams.get('userId')}`);
     }
 
-    if(loading) return <div>로딩중...</div>;
+    if(loading) return <ContentsWrapper>로딩중...</ContentsWrapper>;
 
     return (
         <ContentsWrapper>
             <Title>
                 메뉴 입력에 앞서 자주 사용하는 항목들에 대한 정보를 입력해주세요.
             </Title>
-            <form ref={formRef}>
+            <form>
                 <Label>
                     원두
                     <div className="material-icons">

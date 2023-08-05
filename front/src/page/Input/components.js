@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {ButtonCSS,InputCSS} from '../../components';
+import { ButtonCSS, InputCSS } from '../../components';
 
 export const LinkButton = styled.button`
     ${ButtonCSS}
@@ -80,6 +80,49 @@ export const LabelWithTooltip = styled.label`
     > .material-icons:hover {
         > div {
             display: grid;
+        }
+    }
+`;
+
+export const SelectAndInput = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    > label {
+        font-size: 1.15rem;
+        font-weight: bold;
+    }
+    > div {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        position: relative;
+        align-items: baseline;
+        > div {
+            ${InputCSS}
+            text-align: center;
+            width: 1%;
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: column;
+        }
+        > label {
+            word-break: keep-all;
+            flex-shrink: 0;
+        }
+        > input {
+            ${InputCSS}
+            width: 1%;
+            flex: 1 0 0;
+            margin: 0;
+        }
+        > span {
+            display: block;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
         }
     }
 `;
