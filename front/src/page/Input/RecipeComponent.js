@@ -1,142 +1,170 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import InputComponent from "./InputComponent";
 import FindMaterial from "./FindMaterial";
+import styled from "styled-components";
 
-class RecipeComponet extends Component {
-  constructor(props) {
-    super();
-    this.state = {
-      inputItems: [
-        {
-          id: 0,
-          elementName: "",
-          elementAmount: "",
-          elementPrice: "",
-          elementUnit: "",
-        },
-      ],
-      inputAddId: 1,
-    };
-  }
-
-  addFunction = (items) => {
-    console.log(items);
-    const { inputItems, inputAddId } = this.state;
-    const newItem = {
-      id: inputItems.length,
-      elementName: items.name,
+const RecipeComponent = ({ inputRecipes, preInput }) => {
+  const [inputItems, setInputItems] = useState([
+    {
+      id: 0,
+      elementName: "",
       elementAmount: "",
-      elementUnit: items.volume === 0 ? "개" : items.unit,
-    };
-    this.setState({
-      inputItems: [...inputItems, newItem],
-      inputAddId: inputAddId + 1,
-    });
-  };
-  // input 추가하기
-  AddInput = () => {
-    const { inputItems, inputAddId } = this.state;
+      elementPrice: "",
+      elementUnit: "",
+    },
+  ]);
 
-    const input = {
+  const [inputAddId, setInputAddId] = useState(1);
+
+  const addElement = (items) => {
+    const newItem = {
       id: inputAddId,
       elementName: "",
       elementAmount: "",
-      elementUnit: "",
+      elementUnit: items.volume === 0 ? "개" : items.unit,
     };
-
-    this.setState({
-      inputItems: inputItems.concat({
-        ...input,
-      }),
-      inputAddId: inputAddId + 1,
-    });
+    setInputItems([...inputItems, newItem]);
+    setInputAddId(inputAddId + 1);
   };
 
-  // input 삭제하기
-  InputDelete = (id) => {
-    const { inputItems } = this.state;
+  const ElementDelete = (id) => {
+    setInputItems(inputItems.filter((item) => item.id !== id));
+  };
 
-    this.setState(
-      {
-        inputItems: [],
-      },
-      () => {
-        this.setState({
-          inputItems: inputItems.filter((item) => item.id !== id),
-        });
-      }
+  const onChange = (e, id) => {
+    const { name, value } = e.target;
+    setInputItems(
+      [...inputItems].map((item) =>
+        item.id === id ? { ...item, [name]: value } : item
+      )
     );
   };
 
-  // input 입력 이벤트 핸들러
-  onChange = (e, id) => {
-    const { inputItems } = this.state;
+  return (
+    <MenuRecipe>
+      <MenuInfo>
+        <MenuName>
+          메뉴 이름
+          <Input type="text" maxlength="20" />
+        </MenuName>
+        <MenuPrice>
+          판매 가격
+          <Input type="text" maxlength="20" /> 원
+        </MenuPrice>
+      </MenuInfo>
+      <PreInput>
+        원두
+        <ChooseOption>
+          <Option>
+            <OptionList>
+              {/* {preInput.map((item, index) => (
+                <tr>
+                  <Input type="checkbox" />
+                  {item}
+                </tr>
+              ))} */}
+              <tr>
+                <Input type="checkbox" />
+                에티오피아
+              </tr>
+              <tr>
+                <Input type="checkbox" />
+                콜롬비아
+              </tr>
+              <tr>
+                <Input type="checkbox" />
+                사용안함
+              </tr>
+            </OptionList>
+          </Option>
+          <Amount>
+            <Input />g
+          </Amount>
+        </ChooseOption>
+      </PreInput>
+      <PreInput>
+        우유
+        <ChooseOption>
+          <Option>
+            <OptionList>
+              <tr>
+                <Input type="checkbox" />
+                우유
+              </tr>
+              <tr>
+                <Input type="checkbox" />
+                사용안함
+              </tr>
+            </OptionList>
+          </Option>
+          <Amount>
+            <Input />g
+          </Amount>
+        </ChooseOption>
+      </PreInput>
+      <PreInput>
+        포장재
+        <ChooseOption>
+          <Option>
+            <OptionList>
+              <td>
+                <Input type="checkbox" />
+                음료용
+              </td>
+              <td>
+                <Input type="checkbox" />
+                디저트 박스
+              </td>
+              <td>
+                <Input type="checkbox" />
+                사용안함
+              </td>
+            </OptionList>
+          </Option>
+        </ChooseOption>
+      </PreInput>
+      {console.log("origininputItems")}
+      {console.log(inputItems)}
+      <InputComponent
+        inputItems={inputItems}
+        InputDelete={ElementDelete}
+        onChange={onChange}
+      />
+      <Btn onClick={addElement}>추가</Btn>
+    </MenuRecipe>
+  );
+};
 
-    const data = {
-      [e.target.name]: e.target.value,
-    };
+export default RecipeComponent;
 
-    this.setState({
-      inputItems: inputItems.map((item) =>
-        item.id === id ? { ...item, ...data } : item
-      ),
-    });
-  };
-
-  // 확인 버튼
-  confirm = () => {
-    const { inputItems } = this.state;
-
-    console.log(inputItems);
-  };
-
-  // 렌더링 메서드
-  render() {
-    const { inputItems, inputAddId } = this.state;
-
-    return (
-      <div className="menu">
-        <div>
-          <div>
-            <h3>
-              <label for="id">메뉴 이름</label>
-            </h3>
-            <span class="box int_id">
-              <input
-                type="text"
-                id="id"
-                class="int"
-                maxlength="20"
-                name="menuName"
-              ></input>
-            </span>
-            <span class="error_next_box"></span>
-          </div>
-
-          <div>
-            <h3>
-              <label for="id">메뉴 판매가</label>
-            </h3>
-            <span class="box int_id">
-              <input type="text" id="id" class="int" maxlength="20"></input>
-              <span class="step_url">원</span>
-            </span>
-
-            <span class="error_next_box"></span>
-          </div>
-          <h3>레시피 재료</h3>
-          <InputComponent
-            inputItems={inputItems}
-            addInput={this.AddInput}
-            InputDelete={this.InputDelete}
-            onChange={this.onChange}
-            confirm={this.confirm}
-          />
-          <FindMaterial addFunction={this.addFunction} />
-        </div>
-      </div>
-    );
-  }
-}
-
-export default RecipeComponet;
+const MenuRecipe = styled.div``;
+const MenuInfo = styled.div`
+  display: flex;
+`;
+const MenuName = styled.span`
+  align-items: center;
+  padding: 5px;
+  display: flex;
+`;
+const MenuPrice = styled.span`
+  align-items: center;
+  padding: 10px;
+  display: flex;
+`;
+const PreInput = styled.div`
+  display: flex;
+  margin: 10px;
+`;
+const Input = styled.input`
+  margin: 5px;
+`;
+const ChooseOption = styled.div`
+  display: flex;
+  margin: 20px 10px 10px 10px;
+`;
+const Option = styled.span``;
+const OptionList = styled.table``;
+const Amount = styled.span`
+  padding: 5px;
+`;
+const Btn = styled.button``;
