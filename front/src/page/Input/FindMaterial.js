@@ -102,32 +102,27 @@ const ContentsWrapper = styled.div`
 
 export default function FindMaterial({addFunction}) {
     const [material, setMaterial] = useState([]);
-    const [search, setSearch] = useState({});
+    const [search, setSearch] = useState("");
     const searchRef = useRef();
     const brandRef = useRef();
 
     useEffect(() => {
         if(search === "") return;
         (async () => {
-            const response = await axios.get("/api/search/?keyword="+search.search+"&brand="+search.brand);
+            const response = await axios.get("/api/goods/search?keywords="+search);
             setMaterial(response.data);
         })();
     }, [search]);
     
     const onSubmit = (e) => {
         e.preventDefault();
-        setSearch({
-            search: searchRef.current.value,
-            brand: brandRef.current.value
-        });
+        setSearch(searchRef.current.value);
     };
 
     return (
         <form>
             <Search>
-                <Input type="text" id="id" maxlength="20" placeholder="브랜드 이름" ref={brandRef}></Input>
-                <Input type="text" id="id" maxlength="20" placeholder="재료 이름" ref={searchRef}></Input>
-                <button type="submit" onClick={onSubmit} className="btnplus">검색</button>
+                <Input type="text" id="id" maxlength="20" placeholder="재료 이름" ref={searchRef} onChange={onSubmit}/>
             </Search>
             <ListWrapper>
                 {
