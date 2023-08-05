@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "cd front&&npm install",
     "start": "tsx watch src src/index.ts",
     "build": "cd front&&npm run build",
     "prisma": "prisma migrate dev --name init --preview-feature"
