@@ -37,6 +37,16 @@ export default function () {
         <br />
         <br />! <A>먼저 1~2개의 레시피를 먼저 입력</A>하시며 익히신 후
         <A>추가 입력하시는 것을 추천</A>드립니다.
+        <br />
+        <br />!{" "}
+        <A>
+          메뉴 레포트를 입력하신 경우 개인정보활용동의에 동의하신 것으로 간주
+        </A>
+        합니다.
+        <br />
+        <Blank></Blank>해당 내용은{" "}
+        <A>내부적으로 메뉴 레포트 발행 및 연구를 위해서만 사용</A>
+        됩니다.
       </PP>
 
       <LinkButton to={`/PreInput?userId=${searchParams.get("userId")}`}>
@@ -79,4 +89,8 @@ const Warning = styled.div`
 const A = styled.a`
   color: #ff0000;
   font-weight: bold;
+`;
+
+const Blank = styled.a`
+  margin-left: 5px;
 `;
