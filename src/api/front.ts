@@ -1,6 +1,6 @@
 import { FastifyInstance,FastifyPluginAsync } from "fastify";
 import fastifyStatic from '@fastify/static';
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../config/db';
 import fs from 'fs';
 
 const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
@@ -19,7 +19,6 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
             if (!userId) {
                 return res.code(400).send();
             }
-            const prisma = new PrismaClient();
             const user = await prisma.user.findUnique({
                 where: {
                     uuid: userId,

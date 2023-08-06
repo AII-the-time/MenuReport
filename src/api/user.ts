@@ -1,5 +1,5 @@
 import { FastifyInstance,FastifyPluginAsync } from "fastify";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from '../config/db';
 
 const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
     server.get<
@@ -14,7 +14,6 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
     }
     >('/load/:userId', async (req, res) => {
         const { userId } = req.params;
-        const prisma = new PrismaClient();
         const user = await prisma.user.findUnique({
             where: {
                 uuid: userId,
@@ -35,7 +34,6 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
     }
     >('/save', async (req, res) => {
         const { userId, data } = req.body;
-        const prisma = new PrismaClient();
         await prisma.user.update({
             where: {
                 uuid: userId,

@@ -3,6 +3,6 @@ WORKDIR /usr/src/
 COPY . .
 RUN npm install
 RUN npm run build
-RUN npm run prisma
+RUN npx prisma db pull
 EXPOSE 8888
 CMD ["npm", "start"]
