@@ -40,8 +40,58 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
                 id: 5132,
             },
         });
+
+        // const allMaginAvg = mock.menu.map((menu) => {
+        //     const wonduPrice = menu.wondu.weight * mock.wondu.find((wondu) => wondu.name === menu.wondu.name)?.price;
+        //     const milkPrice = menu.milk.weight * mock.milk.find((milk) => milk.name === menu.milk.name)?.price;
+        //     const pojangjaePrice = menu.pojangjae.reduce((acc, cur) => {
+        //         const price = mock.pojangjae.find((pojangjae) => pojangjae.name === cur)?.price;
+        //         return acc + price;
+        //     }, 0);
+        //     const recipePrice = menu.recipe.reduce((acc, cur) => {
+        //         const price = mock.wondu.find((wondu) => wondu.name === cur.id)?.price;
+        //         return acc + price;
+        //     }, 0);
+        //     const menuPrice = menu.menuPrice;
+        //     const magin = menuPrice - (wonduPrice + milkPrice + pojangjaePrice + recipePrice);
+        //     return magin / menuPrice;
+        // }).reduce((acc, cur) => acc + cur, 0) / mock.menu.length;
+
+
         const result = {
-            "maginAvg": "60%"
+            allMaginAvg: "66.7",
+            //"allProfitexpect": 300000* allMaginAvg,
+            "menu": [
+                {
+                    "name": "카페라떼",
+                    "price": "4500",
+                    "magin": "57.1",
+                    "profit": "1930",
+                    "pojangjae": [
+                        {
+                            "name": "음료M",
+                            "perPrice": "15",
+                        },
+                        {
+                            "name": "빨대",
+                            "perPrice": "10",
+                        }
+                    ],
+                    "recipe": [
+                        {
+                            "name": "케냐",
+                            "weight": "45",
+                            "unitPerPrice": "23",
+                            "price": "1035"
+                        },{
+                            "name": "우유",
+                            "weight": "210",
+                            "unitPerPrice": "2.4",
+                            "price": "504"
+                        }
+                    ]
+                }
+            ]
         };
 
         return res.code(200).send(result);
