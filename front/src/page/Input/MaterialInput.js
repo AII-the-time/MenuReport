@@ -92,13 +92,20 @@ export default function FindMaterial({ item, setMenu=()=>{} }) {
     const searchRef = useRef();
     const volumeRef = useRef();
 
+    const search = async (value) => {
+        try{
+            const response = await axios.get("/api/goods/search?keywords=" + value);
+            setMaterial(response.data);
+        }catch(e){
+            search();
+        }
+    };
 
     const searchOnChange = async (e) => {
         e.preventDefault();
         const { value } = e.target;
         if(value.length < 2) return;
-        const response = await axios.get("/api/goods/search?keywords=" + value);
-        setMaterial(response.data);
+        await search(value);
         await volumeOnChange(e);
     };
 
