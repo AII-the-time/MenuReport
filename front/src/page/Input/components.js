@@ -54,6 +54,7 @@ export const LabelWithTooltip = styled.label`
     display: flex;
     align-items: baseline;
     position: relative;
+    width: 100%;
     > .material-icons {
         font-size: 1.15rem;
         > div {
@@ -72,14 +73,12 @@ export const LabelWithTooltip = styled.label`
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             z-index: 1;
             line-height: normal;
-            grid-template-columns: auto 1fr;
-            grid-gap: 10px;
             font-size: 1rem;
         }
     }
     > .material-icons:hover {
         > div {
-            display: grid;
+            display: block;
         }
     }
 `;

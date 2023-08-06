@@ -4,25 +4,12 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { ContentsWrapper } from '../../components';
 import { LinkButton, PlusButton,TwoInputWithLabel,SelectAndInput, LabelWithTooltip } from './components';
+import MaterialInput from './MaterialInput';
 
-const PreInput = styled.div`
-  display: flex;
-  margin: 10px;
-`;
 const Input = styled.input`
   margin: 5px;
 `;
-const ChooseOption = styled.div`
-  display: flex;
-  margin: 20px 10px 10px 10px;
-`;
-const Option = styled.span``;
-const OptionList = styled.table``;
-const Amount = styled.span`
-  padding: 5px;
-`;
 const RecipeInput = styled.div``;
-const Btn = styled.button``;
 
 export default function App() {
   const [searchParams] = useSearchParams();
@@ -145,12 +132,17 @@ export default function App() {
           ))}
         </div>
       </SelectAndInput>
-      <RecipeInput>
-        <Input />
-        <Amount>
-          <Input />g
-        </Amount>
-      </RecipeInput>
+      <LabelWithTooltip>
+        추가 재료
+        <div className="material-icons">
+          help_outline
+          <div>
+            <p>재료 이름이나 브랜드명으로 검색하시면 CNT 마트에서 구매 가능한 재료를 찾아드립니다.</p>
+            <p>단어 단위로 띄어쓰기 하시면 더 많은 검색 결과를 보실 수 있습니다.</p>
+          </div>
+        </div>
+      </LabelWithTooltip>
+      <MaterialInput />
       <PlusButton>+ 메뉴 추가</PlusButton>
       <LinkButton onClick={nextLoding ? (e)=>{e.preventDefault()} : onClick} type="submit">
         {nextLoding ? '메뉴 리포트 생성 중...' : '다음으로'}
