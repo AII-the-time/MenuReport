@@ -86,9 +86,9 @@ const ContentsWrapper = styled.div`
 }
 `;
 
-export default function FindMaterial({ setMenu=()=>{} }) {
+export default function FindMaterial({ item, setMenu=()=>{} }) {
     const [material, setMaterial] = useState([]);
-    const menu = useRef(null);
+    const menu = useRef(item);
     const searchRef = useRef();
     const volumeRef = useRef();
 
@@ -105,16 +105,21 @@ export default function FindMaterial({ setMenu=()=>{} }) {
     const volumeOnChange = async (e) => {
         e.preventDefault();
         setMenu({
-            id: menu.current?.id,
+            name: menu.current.name,
             volume: volumeRef.current.value,
+            unit: menu.current.unit,
         })
     };
 
     const materialOnClick = (item) =>async (e) => {
         e.preventDefault();
+        item.name = item.brand + " " + item.name;
+        delete item.brand;
+        delete item.image;
+        delete item.volume;
         menu.current = item;
         setMaterial([]);
-        searchRef.current.value = item.brand + " " + item.name;
+        searchRef.current.value = item.name;
         await volumeOnChange(e);
     };
 
@@ -133,7 +138,7 @@ export default function FindMaterial({ setMenu=()=>{} }) {
     return (
         <Wrapper>
             <div>
-                <input type="text" id="id" maxlength="20" placeholder="재료 이름" ref={searchRef} onChange={searchOnChange}/>
+                <input type="text" id="id" placeholder="재료 이름" ref={searchRef} onChange={searchOnChange} defaultValue={menu.current.name} />
                 {
                     material.length > 0 && (<div>
                         {
@@ -162,7 +167,7 @@ export default function FindMaterial({ setMenu=()=>{} }) {
                 }
             </div>
             <div>
-                <input type="text" id="id" maxlength="20" placeholder="1회 사용량" ref={volumeRef} onChange={volumeOnChange} />
+                <input type="text" id="id" placeholder="1회 사용량" ref={volumeRef} onChange={volumeOnChange} defaultValue={menu.current.volume} />
                 <span>{menu.current ? menu.current.unit : ""}</span>
             </div>
         </Wrapper>

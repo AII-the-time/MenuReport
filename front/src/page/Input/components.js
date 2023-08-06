@@ -125,3 +125,38 @@ export const SelectAndInput = styled.div`
         }
     }
 `;
+
+export const MenuWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+`;
+
+export const OpenWrapper = styled.div`
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    > div {
+        display: flex;
+        gap: 10px;
+        font-size: 1.15rem;
+        font-weight: bold;
+    }
+    > div:last-child {
+        width: 20px;
+        height: 20px;
+        transform: rotate(45deg);
+        border: 3px solid #ccc;
+        border-top: none;
+        border-left: none;
+        margin-left: auto;
+        cursor: pointer;
+    }
+`;
