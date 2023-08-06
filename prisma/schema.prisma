@@ -6,25 +6,26 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-model User{
-    id Int @id @default(autoincrement())
-    uuid String @unique
-    name String
-    data Json?
+
+model User {
+  id   Int     @id @default(autoincrement())
+  name String
+  data String? @db.LongText
+  uuid String  @unique
 }
 
 model goods {
-    id          Int      @id @default(autoincrement())
-    name        String
-    brand       String
-    itemCode    String
-    price       Int
-    image       String
-    category    String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    tag         Json    @default("[]")
-    volume      Int     @default(0)
-    unit        String  @default("ml")
-    count       Int     @default(1)
+  id        Int      @id @default(autoincrement())
+  name      String
+  brand     String
+  itemCode  String
+  price     Int
+  image     String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tag       String   @db.LongText
+  volume    Int      @default(0)
+  unit      String   @default("ml")
+  count     Int      @default(1)
 }
