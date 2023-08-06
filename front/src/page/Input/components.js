@@ -54,6 +54,7 @@ export const LabelWithTooltip = styled.label`
     display: flex;
     align-items: baseline;
     position: relative;
+    width: 100%;
     > .material-icons {
         font-size: 1.15rem;
         > div {
@@ -72,14 +73,12 @@ export const LabelWithTooltip = styled.label`
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             z-index: 1;
             line-height: normal;
-            grid-template-columns: auto 1fr;
-            grid-gap: 10px;
             font-size: 1rem;
         }
     }
     > .material-icons:hover {
         > div {
-            display: grid;
+            display: block;
         }
     }
 `;
@@ -124,5 +123,40 @@ export const SelectAndInput = styled.div`
             top: 50%;
             transform: translateY(-50%);
         }
+    }
+`;
+
+export const MenuWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+`;
+
+export const OpenWrapper = styled.div`
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    > div {
+        display: flex;
+        gap: 10px;
+        font-size: 1.15rem;
+        font-weight: bold;
+    }
+    > div:last-child {
+        width: 20px;
+        height: 20px;
+        transform: rotate(45deg);
+        border: 3px solid #ccc;
+        border-top: none;
+        border-left: none;
+        margin-left: auto;
+        cursor: pointer;
     }
 `;
