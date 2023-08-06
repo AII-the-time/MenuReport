@@ -149,7 +149,7 @@ export default function App() {
             <SelectAndInput>
               <label>포장재</label>
               <div>
-                {pojangjaeKind.map((it, i) => (
+                {pojangjaeKind.map(e=>e.name).map((it, i) => (
                   <div key={i} onClick={(e)=>{
                     e.preventDefault();
                     const newMenu = [...menu];
@@ -160,7 +160,7 @@ export default function App() {
                     }
                     setMenu(newMenu);
                   }} style={{backgroundColor:item.pojangjae.includes(it) ? 'var(--main-color)' : 'white', color:item.pojangjae.includes(it) ? 'white' : 'black'}}>
-                    {it.name}
+                    {it}
                   </div>
                 ))}
               </div>
