@@ -74,7 +74,10 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
                         id: recipeInfo.id,
                         name: recipeInfo.name,
                         weight: recipe.volume,
-                        price: Math.round((recipeInfo.price / (recipeInfo.volume?recipeInfo.volume * recipeInfo.count:recipeInfo.count))*100)/100,
+                        price: Math.round(
+                            (recipeInfo.price / (recipeInfo.volume?recipeInfo.volume * recipeInfo.count:recipeInfo.count))
+                            * recipe.volume
+                            *100)/100,
                         unit: recipeInfo.volume?recipeInfo.unit: "개"
                     }
                 }))

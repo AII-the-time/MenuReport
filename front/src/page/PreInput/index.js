@@ -41,20 +41,33 @@ export default function(){
         setNextLoading(true);
         try{
             const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
+            if([wondu,milk,pojangjae].some(_ => _.some(item => Object.values(item).some(_ => _ ==="")))){
+                const confirm = window.confirm('이름, 단위, 가격이 모두 입력되지 않은 항목은 삭제됩니다. 계속하시겠습니까?');
+                if(!confirm){
+                    setNextLoading(false);
+                    return;
+                }
+                const [filterdWondu,filterdMilk,filterdPojangjae] = [wondu,milk,pojangjae]
+                    .map(_ => _.filter(item => Object.values(item).every(_ => _ !== "")));
+                setWondu(filterdWondu);
+                setMilk(filterdMilk);
+                setPojangjae(filterdPojangjae);
+                setNextLoading(false);
+                return;
+            }
             const requestData = {
                 userId: searchParams.get('userId'),
                 data:{
                     ...response.data,
-                    wondu: wondu,
-                    milk: milk,
-                    pojangjae: pojangjae
+                    wondu,
+                    milk,
+                    pojangjae
                 }
             };
-            
-            console.log(requestData);
 
             await axios.post('/api/user/save', requestData);
         }catch(e){
+            console.log(e);
             setNextLoading(false);
             alert('저장에 실패했습니다. 다시 시도해주세요.');
             return;

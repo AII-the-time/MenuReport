@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ContentsWrapper } from '../../components';
-import { Report, TopInfo, Average, MenuList, Span, H3, H6, H8 } from './components';
+import { ContentsWrapper, Title } from '../../components';
+import { BorderSpan, TopInfo, Average, MenuList, Span, H3, H6, H8 } from './components';
 import DetailMenu from "./DetailMenu";
 import axios from 'axios';
 
@@ -31,38 +31,33 @@ export default function () {
     console.log(result);
     return (
         <ContentsWrapper>
-            <Report>
-                <TopInfo>
-                    <h1>메뉴 레포트</h1>
-                    <div>
-                        현재 지속 연구 개발중이므로 제안하시고 싶으신 부분이나 불편한 점이
-                        있으셨다면 언제든{" "}
-                        <a href="https://open.kakao.com/o/s1CqnUyf" target="_blank">
-                            문의해주세요
-                        </a>{" "}
-                        이 레포트에 담긴 내용은 오차가 있을 수 있으므로 참고용으로
-                        활용해주시면 감사하겠습니다.
-                    </div>
-                </TopInfo>
-                <Average>
-                    <Span>
-                        <H3>66.7% </H3>
-                        <H6>평균 마진율</H6>
-                    </Span>
-                    <Span>
-                        <H3>200,100원 </H3>
-                        <H6>매출 30만원 판매시</H6>
-                        <H8>
-                            평균 마진율 기반이어서
-                            <br />
-                            오차가 있을 수 있어요!
-                        </H8>
-                    </Span>
-                </Average>
-                <MenuList>
-                    <DetailMenu />
-                </MenuList>
-            </Report>
+            <Title>메뉴 리포트</Title>
+            <TopInfo>
+                <div style={{ wordBreak: 'keep-all' }}>
+                    현재 지속 연구·개발중이므로
+                    제안하시고 싶으신 부분이나 불편한 점이 있으셨다면
+                    언제든 <a href="https://open.kakao.com/o/s1CqnUyf" target="_blank">
+                        문의해주세요
+                    </a>
+                    <br />
+                    이 레포트에 담긴 내용은 오차가 있을 수 있으므로 참고용으로
+                    활용해주시면 감사하겠습니다.
+                </div>
+            </TopInfo>
+            <Average>
+                <div>
+                    <span>평균 마진율</span>
+                    <BorderSpan>66.7% </BorderSpan>
+                </div>
+                <span style={{ wordBreak: 'keep-all', fontSize: '0.9rem', color:"#888" }}>
+                    모든 메뉴가 동일한 비율로 팔렸다고 가정한 값입니다.
+                    <br />
+                    따라서 실제 매출과 차이가 있을 수 있으나, 추후 포스기와 연동하여 정확한 매출을 계산할 수 있도록 개발할 예정입니다.
+                </span>
+            </Average>
+            <MenuList>
+                <DetailMenu />
+            </MenuList>
         </ContentsWrapper>
     );
 }
