@@ -39,7 +39,7 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
                 uuid: userId,
             },
             data: {
-                data: JSON.stringify(data),
+                data: data,
             },
         });
         return res.code(200).send();

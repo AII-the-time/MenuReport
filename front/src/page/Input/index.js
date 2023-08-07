@@ -22,7 +22,7 @@ export default function App() {
       try {
         const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
         if(!response.data){
-          window.location.href = '/?userId='+searchParams.get('userId');
+          navigate('/?userId='+searchParams.get('userId'));
           return;
         }
         setWonduKind(response.data.wondu);

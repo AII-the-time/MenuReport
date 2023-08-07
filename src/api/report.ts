@@ -5,112 +5,102 @@ import internal from "stream";
 const api: FastifyPluginAsync = async (server: FastifyInstance) => {
     server.get<
         {
+            Querystring: {
+                userId: string;
+            },
             Reply: {
                 200: object;
                 404: undefined;
             }
         }
     >('/', async (req, res) => {
-        const mock = {
-            "wondu": [{ "name": "케냐", "weight": "1000", "price": "23000" }, { "name": "에티오피아", "weight": "1000", "price": "26000" }],
-            "milk": [{ "name": "우유", "weight": "1000", "price": "2400"}],
-            "pojangjae": [{ "name": "음료M", "count": "2000", "price": "30000" }, { "name": "음료L", "count": "2000", "price": "33000" }, { "name": "빨대", "count": "1000", "price": "20000" }],
-            "menu": [
-                {
-                    menuName: '카페라떼',
-                    menuPrice: '4500',
-                    wondu: { name: '케냐', weight: '45' },
-                    milk: { name: '우유', weight: '210' },
-                    pojangjae: ["음료M", "빨대"],
-                    recipe: [],
-                },
-                {
-                    menuName: '초코라떼',
-                    menuPrice: '4500',
-                    wondu: { name: '사용안함', weight: '0' },
-                    milk: { name: '우유', weight: '210' },
-                    pojangjae: ["음료M", "빨대"],
-                    recipe: [{ id: 5132, weight: '50' }, { id: 743, weight: '50' }],
-                },
-            ]
-        };
+        const { userId } = req.query;
+        const user = await prisma.user.findFirst({
+            where: {
+                uuid: userId,
+            },
+        });
+        if (!user) {
+            return res.code(404).send();
+        }
+        const userData:any = user.data;
 
         //print prisma.goods.findFirst on mock menu
 
         let menuData: any = [];
         let mainMagin: any = 0;
-        for (let i = 0; i < mock.menu.length; i++) {
+        for (let i = 0; i < userData.menu.length; i++) {
             let recipeCost: any = 0;
             let pojangjaeCost: any = 0;
             let menuComponent: any = {
-                name: mock.menu[i].menuName,
-                price: mock.menu[i].menuPrice,
+                name: userData.menu[i].menuName,
+                price: userData.menu[i].menuPrice,
                 magin: 0,
                 profit: 0,
                 pojangjae: [],
                 recipe: [],
             };
-            for (let j = 0; j < mock.menu[i].pojangjae.length; j++) {
+            for (let j = 0; j < userData.menu[i].pojangjae.length; j++) {
                 let pojangjaePrice: any = 0;
-                for (let k = 0; k < mock.pojangjae.length; k++) {
-                    if (mock.menu[i].pojangjae[j] == mock.pojangjae[k].name) {
-                        pojangjaePrice = Math.round((+mock.pojangjae[k].price / +mock.pojangjae[k].count * 100) / 100);
+                for (let k = 0; k < userData.pojangjae.length; k++) {
+                    if (userData.menu[i].pojangjae[j] == userData.pojangjae[k].name) {
+                        pojangjaePrice = Math.round((+userData.pojangjae[k].price / +userData.pojangjae[k].count * 100) / 100);
                     }
                 }
                 menuComponent.pojangjae.push({
-                    name: mock.menu[i].pojangjae[j],
+                    name: userData.menu[i].pojangjae[j],
                     price : pojangjaePrice,
                 }
                 );
                 pojangjaeCost += pojangjaePrice;
             }
-            if (mock.menu[i].wondu.name != "사용안함") {
+            if (userData.menu[i].wondu.name != "사용안함") {
                 let wonduPrice: any = 0;
-                for (let k = 0; k < mock.wondu.length; k++) {
-                    if (mock.menu[i].wondu.name == mock.wondu[k].name) {
-                        wonduPrice = Math.round((+mock.wondu[k].price / +mock.wondu[k].weight * 100) / 100);
+                for (let k = 0; k < userData.wondu.length; k++) {
+                    if (userData.menu[i].wondu.name == userData.wondu[k].name) {
+                        wonduPrice = Math.round((+userData.wondu[k].price / +userData.wondu[k].weight * 100) / 100);
                     }
                 }
                 let menuInfo: any = {
                     id: -1,
-                    name: mock.menu[i].wondu.name,
-                    weight: mock.menu[i].wondu.weight,
+                    name: userData.menu[i].wondu.name,
+                    weight: userData.menu[i].wondu.weight,
                     unitPerPrice: wonduPrice, //원두 가격 찾아서 넣어야 함.
-                    price: Math.round((+mock.menu[i].wondu.weight * wonduPrice) * 100) / 100, //원두 가격 찾아서 넣어야 함.
+                    price: Math.round((+userData.menu[i].wondu.weight * wonduPrice) * 100) / 100, //원두 가격 찾아서 넣어야 함.
                 }
                 recipeCost += menuInfo.price;
                 menuComponent.recipe.push(menuInfo);
             }
-            if (mock.menu[i].milk.name != "사용안함") {
+            if (userData.menu[i].milk.name != "사용안함") {
                 let milkPrice: any = 0;
-                for (let k = 0; k < mock.milk.length; k++) {
-                    if (mock.menu[i].milk.name == mock.milk[k].name) {
-                        milkPrice = Math.round((+mock.milk[k].price / +mock.milk[k].weight * 100))/100;
+                for (let k = 0; k < userData.milk.length; k++) {
+                    if (userData.menu[i].milk.name == userData.milk[k].name) {
+                        milkPrice = Math.round((+userData.milk[k].price / +userData.milk[k].weight * 100))/100;
                     }
                 }
                 
                 let menuInfo: any = {
                     id: -1,
-                    name: mock.menu[i].milk.name,
-                    weight: mock.menu[i].milk.weight,
+                    name: userData.menu[i].milk.name,
+                    weight: userData.menu[i].milk.weight,
                     unitPerPrice: milkPrice, //우유 가격 찾아서 넣어야 함.
-                    price: Math.round((+mock.menu[i].milk.weight * milkPrice) * 100) / 100, //우유 가격 찾아서 넣어야 함.
+                    price: Math.round((+userData.menu[i].milk.weight * milkPrice) * 100) / 100, //우유 가격 찾아서 넣어야 함.
                 }
                 menuComponent.recipe.push(menuInfo);
                 recipeCost += menuInfo.price; 
             }
-            for (let j = 0; j < mock.menu[i].recipe.length; j++) {
+            for (let j = 0; j < userData.menu[i].recipe.length; j++) {
                 let tempMenuInfo:any = await prisma.goods.findFirst({
                     where: {
-                        id: mock.menu[i].recipe[j].id,
+                        id: userData.menu[i].recipe[j].id,
                     },
                 });
                 let menuInfo: any = {
                     id: tempMenuInfo.id,
                     name: tempMenuInfo.name,
-                    weight: mock.menu[i].recipe[j].weight,
+                    weight: userData.menu[i].recipe[j].weight,
                     unitPerPrice: tempMenuInfo.price / tempMenuInfo.volume,
-                    price: Math.round((tempMenuInfo.price / tempMenuInfo.volume * +mock.menu[i].recipe[j].weight)*100)/100,
+                    price: Math.round((tempMenuInfo.price / tempMenuInfo.volume * +userData.menu[i].recipe[j].weight)*100)/100,
                 }
                 recipeCost += menuInfo.price;
                 menuComponent.recipe.push(menuInfo);
@@ -130,7 +120,7 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
         //     },
         // });
         const result = {
-            allMaginAvg: Math.round((mainMagin / mock.menu.length)*100)/100,
+            allMaginAvg: Math.round((mainMagin / userData.menu.length)*100)/100,
             menu: { ...menuData },
         };
 
