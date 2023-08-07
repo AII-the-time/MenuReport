@@ -43,7 +43,8 @@ export default function App() {
         setMenu(response.data.menu);
         setLoading(false);
       } catch (e) {
-        window.location.reload();
+        alert('서버에 문제가 있습니다. 다시 시도해주세요.');
+        navigate('/Input?userId='+searchParams.get('userId'));
       }
     };
     setDefault();

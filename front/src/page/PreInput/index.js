@@ -29,7 +29,8 @@ export default function(){
                 setPojangjae(response.data.pojangjae);
                 setLoading(false);
             }catch(e){
-                window.location.reload();
+                alert('서버에 문제가 있습니다. 다시 시도해주세요.');
+                navigate(`/?userId=${searchParams.get('userId')}`);
             }
         }
         setDefault();
