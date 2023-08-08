@@ -14,7 +14,7 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
     }
     >('/load/:userId', async (req, res) => {
         const { userId } = req.params;
-        const user = await prisma.user.findUnique({
+        const user:any = await prisma.user.findUnique({
             where: {
                 uuid: userId,
             },
@@ -22,7 +22,7 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
         if (!user) {
             return res.code(404).send();
         }
-        return res.code(200).send(user.data);
+        return res.code(200).send(JSON.parse(user.data));
     });
 
     server.post<
@@ -34,12 +34,13 @@ const api: FastifyPluginAsync =  async (server: FastifyInstance) => {
     }
     >('/save', async (req, res) => {
         const { userId, data } = req.body;
+        console.log(data);
         await prisma.user.update({
             where: {
                 uuid: userId,
             },
             data: {
-                data: data,
+                data: JSON.stringify(data),
             },
         });
         return res.code(200).send();

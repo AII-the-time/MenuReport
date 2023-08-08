@@ -14,7 +14,7 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
         }
     >('/', async (req, res) => {
         const { userId } = req.query;
-        const user = await prisma.user.findFirst({
+        const user:any = await prisma.user.findFirst({
             where: {
                 uuid: userId,
             },
@@ -22,7 +22,7 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
         if (!user) {
             return res.code(404).send();
         }
-        const userData:any = user.data;
+        const userData:any = JSON.parse(user.data);
 
         const [wonduWithUnitPrice,milkWithUnitPrice,pojangjaeWithUnitPrice] = [[userData.wondu,"weight","g"],[userData.milk,"weight","ml"],[userData.pojangjae,"count","개"]]
             .map(([item,type,unit]:any) => item.map((item2:any) => {
