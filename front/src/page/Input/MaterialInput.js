@@ -112,6 +112,7 @@ export default function FindMaterial({ item, setMenu=()=>{} }) {
     const volumeOnChange = async (e) => {
         e.preventDefault();
         setMenu({
+            id: menu.current.id?menu.current.id:-1,
             name: menu.current.name,
             volume: volumeRef.current.value,
             unit: menu.current.unit,
@@ -123,6 +124,7 @@ export default function FindMaterial({ item, setMenu=()=>{} }) {
         item.name = item.brand + " " + item.name;
         delete item.brand;
         delete item.image;
+        item.unit = item.volume ? item.unit : "개";
         delete item.volume;
         menu.current = item;
         setMaterial([]);

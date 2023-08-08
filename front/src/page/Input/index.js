@@ -3,7 +3,7 @@ import {useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
 import { ContentsWrapper } from '../../components';
-import { LinkButton, PlusButton,TwoInputWithLabel,SelectAndInput, LabelWithTooltip,OpenWrapper,MenuWrapper } from './components';
+import { LinkButton, PlusButton,TwoInputWithLabel,SelectAndInput, LabelWithTooltip,OpenWrapper,MenuWrapper,BorderDiv } from './components';
 import MaterialInput from './MaterialInput';
 
 export default function App() {
@@ -43,7 +43,8 @@ export default function App() {
         setMenu(response.data.menu);
         setLoading(false);
       } catch (e) {
-        window.location.reload();
+        alert('서버에 문제가 있습니다. 다시 시도해주세요.');
+        navigate('/Input?userId='+searchParams.get('userId'));
       }
     };
     setDefault();
@@ -54,14 +55,37 @@ export default function App() {
     setNextLoding(true);
     try{
       const response = await axios.get(`/api/user/load/${searchParams.get('userId')}`);
+      if(menu.some(_ => _.recipe.some(item => Object.values(item).some(_ => _ ==="")))){
+        const confirm = window.confirm('추가재료 중 1회 사용량이 입력되지 않은 항목은 삭제됩니다. 계속하시겠습니까?');
+        if(!confirm){
+          setNextLoding(false);
+          return;
+        }
+      }
+      if(menu.some(item => item.menuName === ""
+        || item.menuPrice === ""
+        || (item.milk.name !== '사용안함' && item.milk.weight === '')
+        || (item.wondu.name !== '사용안함' && item.wondu.weight === ''))){
+          const confirm = window.confirm('메뉴 이름, 메뉴 가격이 입력되지 않았거나 원두/우유를 선택하였으나 1회 사용량이 입력되지 않은 항목은 삭제됩니다. 계속하시겠습니까?');
+          if(!confirm){
+            setNextLoding(false);
+            return;
+          }
+      }
+      const filterdMenu = menu.map(_ => ({
+        ..._,
+        recipe: _.recipe.filter(item => Object.values(item).every(_ => _ !== ""))
+      })).filter(_ => _.menuName !== ""
+        && _.menuPrice !== ""
+        && (_.milk.name === '사용안함' || _.milk.weight !== '')
+        && (_.wondu.name === '사용안함' || _.wondu.weight !== ''));
       const requestData = {
         userId: searchParams.get('userId'),
         data:{
           ...response.data,
-          menu: menu
+          menu: filterdMenu
         }
       };
-      console.log(requestData);
       await axios.post('/api/user/save', requestData);
     }catch(e){
       setNextLoding(false);
@@ -82,21 +106,19 @@ export default function App() {
 
   return (
     <ContentsWrapper>
-      {menu.map((item, index) => {
-        if(index !== curIndex) return (
-          <OpenWrapper key={index} onClick={(e)=>{
+      {menu.map((item, index) => (
+        <BorderDiv key={index}> 
+          <OpenWrapper onClick={(e)=>{
             e.preventDefault();
             setCurIndex(index);
-          }}>
+          }} open={curIndex !== index}>
             <div>
               <span>{item.menuName}</span>
-              <span>{item.menuPrice}</span>
+              <span>{Number(item.menuPrice).toLocaleString("ko-KR")}원</span>
             </div>
             <div></div>
           </OpenWrapper>
-        );
-        return (
-          <MenuWrapper key={index}>
+          <MenuWrapper open={curIndex === index}>
             <TwoInputWithLabel>
               <div>
                 <label>메뉴 이름</label>
@@ -175,7 +197,7 @@ export default function App() {
                 </div>
               </div>
             </LabelWithTooltip>
-            {[...item.recipe, {"name":"", "volume":"", "unit": ""}].map((it, i) => (
+            {[...item.recipe.filter(item => item.name !== ''), {"name":"", "volume":"", "unit": ""}].map((it, i) => (
               <MaterialInput key={i} item={it} setMenu={(item)=>{
                 const newMenu = [...menu];
                 newMenu[index].recipe[i] = item;
@@ -183,7 +205,7 @@ export default function App() {
               }}/>
             ))}
           </MenuWrapper>
-        )}
+        </BorderDiv>)
       )}
       <PlusButton onClick={(e) => {
         e.preventDefault();

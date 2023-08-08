@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { prisma } from '../config/db';
-import internal from "stream";
 
 const api: FastifyPluginAsync = async (server: FastifyInstance) => {
     server.get<
@@ -15,7 +14,7 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
         }
     >('/', async (req, res) => {
         const { userId } = req.query;
-        const user = await prisma.user.findFirst({
+        const user:any = await prisma.user.findFirst({
             where: {
                 uuid: userId,
             },
@@ -23,105 +22,84 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
         if (!user) {
             return res.code(404).send();
         }
-        const userData:any = user.data;
+        const userData:any = JSON.parse(user.data);
 
-        //print prisma.goods.findFirst on mock menu
+        const [wonduWithUnitPrice,milkWithUnitPrice,pojangjaeWithUnitPrice] = [[userData.wondu,"weight","g"],[userData.milk,"weight","ml"],[userData.pojangjae,"count","개"]]
+            .map(([item,type,unit]:any) => item.map((item2:any) => {
+                const tempItem:any = {...item2};
+                tempItem[`pricePer${type.replace(/^[a-z]/,(c:any)=>c.toUpperCase())}`] = Math.round((+item2.price / +item2[type] * 100))/100;
+                tempItem.unit = unit;
+                return tempItem;
+            }));
+        const menu: any = await Promise.all(userData.menu.map(async (menu: any) => {
+            const pojangjae = menu.pojangjae.map((pojangjae: any) => {
+                const pojangjaeInfo: any = pojangjaeWithUnitPrice.find((item: any) => item.name == pojangjae);
+                return {
+                    name: pojangjaeInfo.name,
+                    price: pojangjaeInfo.pricePerCount
+                }
+            });
 
-        let menuData: any = [];
-        let mainMagin: any = 0;
-        for (let i = 0; i < userData.menu.length; i++) {
-            let recipeCost: any = 0;
-            let pojangjaeCost: any = 0;
-            let menuComponent: any = {
-                name: userData.menu[i].menuName,
-                price: userData.menu[i].menuPrice,
-                magin: 0,
-                profit: 0,
-                pojangjae: [],
-                recipe: [],
-            };
-            for (let j = 0; j < userData.menu[i].pojangjae.length; j++) {
-                let pojangjaePrice: any = 0;
-                for (let k = 0; k < userData.pojangjae.length; k++) {
-                    if (userData.menu[i].pojangjae[j] == userData.pojangjae[k].name) {
-                        pojangjaePrice = Math.round((+userData.pojangjae[k].price / +userData.pojangjae[k].count * 100) / 100);
+            const recipe = [
+                ...[[wonduWithUnitPrice,menu.wondu],[milkWithUnitPrice,menu.milk]]
+                    .map(([info,recipe]) => {
+                        const infoOfThisMenu = info.find((item: any) => item.name == recipe.name);
+                        if(infoOfThisMenu)
+                            return {
+                                id: -1,
+                                name: recipe.name,
+                                weight: recipe.weight,
+                                price: Math.round((+recipe.weight * infoOfThisMenu.pricePerWeight)*100)/100,
+                                unit: infoOfThisMenu.unit
+                            }
+                        return null;
+                    })
+                    .filter((item:any) => item),
+                ...await Promise.all(menu.recipe.map(async (recipe: any) => {
+                    if(!recipe.id) {
+                        return {
+                            id: -1,
+                            name: recipe.name,
+                            weight: recipe.volume,
+                            price: 0,
+                            unit: recipe.volume?recipe.unit: "개"
+                        }
                     }
-                }
-                menuComponent.pojangjae.push({
-                    name: userData.menu[i].pojangjae[j],
-                    price : pojangjaePrice,
-                }
-                );
-                pojangjaeCost += pojangjaePrice;
-            }
-            if (userData.menu[i].wondu.name != "사용안함") {
-                let wonduPrice: any = 0;
-                for (let k = 0; k < userData.wondu.length; k++) {
-                    if (userData.menu[i].wondu.name == userData.wondu[k].name) {
-                        wonduPrice = Math.round((+userData.wondu[k].price / +userData.wondu[k].weight * 100) / 100);
+                    const recipeInfo: any = await prisma.goods.findFirst({
+                        where: {
+                            id: recipe.id,
+                        },
+                    });
+                    return {
+                        id: recipeInfo.id,
+                        name: recipeInfo.name,
+                        weight: recipe.volume,
+                        price: Math.round(
+                            (recipeInfo.price / (recipeInfo.volume?recipeInfo.volume * recipeInfo.count:recipeInfo.count))
+                            * recipe.volume
+                            *100)/100,
+                        unit: recipeInfo.volume?recipeInfo.unit: "개"
                     }
-                }
-                let menuInfo: any = {
-                    id: -1,
-                    name: userData.menu[i].wondu.name,
-                    weight: userData.menu[i].wondu.weight,
-                    unitPerPrice: wonduPrice, //원두 가격 찾아서 넣어야 함.
-                    price: Math.round((+userData.menu[i].wondu.weight * wonduPrice) * 100) / 100, //원두 가격 찾아서 넣어야 함.
-                }
-                recipeCost += menuInfo.price;
-                menuComponent.recipe.push(menuInfo);
-            }
-            if (userData.menu[i].milk.name != "사용안함") {
-                let milkPrice: any = 0;
-                for (let k = 0; k < userData.milk.length; k++) {
-                    if (userData.menu[i].milk.name == userData.milk[k].name) {
-                        milkPrice = Math.round((+userData.milk[k].price / +userData.milk[k].weight * 100))/100;
-                    }
-                }
-                
-                let menuInfo: any = {
-                    id: -1,
-                    name: userData.menu[i].milk.name,
-                    weight: userData.menu[i].milk.weight,
-                    unitPerPrice: milkPrice, //우유 가격 찾아서 넣어야 함.
-                    price: Math.round((+userData.menu[i].milk.weight * milkPrice) * 100) / 100, //우유 가격 찾아서 넣어야 함.
-                }
-                menuComponent.recipe.push(menuInfo);
-                recipeCost += menuInfo.price; 
-            }
-            for (let j = 0; j < userData.menu[i].recipe.length; j++) {
-                let tempMenuInfo:any = await prisma.goods.findFirst({
-                    where: {
-                        id: userData.menu[i].recipe[j].id,
-                    },
-                });
-                let menuInfo: any = {
-                    id: tempMenuInfo.id,
-                    name: tempMenuInfo.name,
-                    weight: userData.menu[i].recipe[j].weight,
-                    unitPerPrice: tempMenuInfo.price / tempMenuInfo.volume,
-                    price: Math.round((tempMenuInfo.price / tempMenuInfo.volume * +userData.menu[i].recipe[j].weight)*100)/100,
-                }
-                recipeCost += menuInfo.price;
-                menuComponent.recipe.push(menuInfo);
-            }
-            
-            menuComponent.magin = Math.round(((menuComponent.price - recipeCost - pojangjaeCost) / menuComponent.price * 100)*100)/100;
-            menuComponent.profit = menuComponent.price - recipeCost - pojangjaeCost;
-            mainMagin += menuComponent.magin;
-            menuData.push(menuComponent);
-        }
-        console.log(menuData);
-       
-                
-        // const price = await prisma.goods.findFirst({
-        //     where: {
-        //         id: mock.menu[0].recipe[0].id,
-        //     },
-        // });
+                }))
+            ];
+
+            const cost = [pojangjae,recipe]
+                .map(e=>e.reduce((acc: any, cur: any) => acc + cur.price, 0))
+                .reduce((acc: any, cur: any) => acc + cur, 0);
+
+            const name = menu.menuName;
+            const price = menu.menuPrice;
+            const profit = Math.round((price - cost)*100)/100;
+            const magin = Math.round((profit / price * 100)*100)/100;
+
+            return { name, price, magin, profit, pojangjae, recipe };
+        }));
+
         const result = {
-            allMaginAvg: Math.round((mainMagin / userData.menu.length)*100)/100,
-            menu: { ...menuData },
+            allMaginAvg: Math.round((menu.reduce((acc: any, cur: any) => {
+                return acc + cur.magin;
+            }, 0) / menu.length)*100)/100,
+            menu: menu,
         };
 
         return res.code(200).send(result);
