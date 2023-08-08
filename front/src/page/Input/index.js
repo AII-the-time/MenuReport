@@ -107,109 +107,104 @@ export default function App() {
   return (
     <ContentsWrapper>
       {menu.map((item, index) => (
-        <BorderDiv key={index}> {
-          index !== curIndex
-          ? (
-            <OpenWrapper key={index} onClick={(e)=>{
-              e.preventDefault();
-              setCurIndex(index);
-            }}>
+        <BorderDiv key={index}> 
+          <OpenWrapper onClick={(e)=>{
+            e.preventDefault();
+            setCurIndex(index);
+          }} open={curIndex !== index}>
+            <div>
+              <span>{item.menuName}</span>
+              <span>{Number(item.menuPrice).toLocaleString("ko-KR")}원</span>
+            </div>
+            <div></div>
+          </OpenWrapper>
+          <MenuWrapper open={curIndex === index}>
+            <TwoInputWithLabel>
               <div>
-                <span>{item.menuName}</span>
-                <span>{item.menuPrice}</span>
+                <label>메뉴 이름</label>
+                <input name="menuName" type="text" onChange={(e)=>{updateMenu(index,"menuName",e.target.value)}} defaultValue={item.menuName} />
               </div>
-              <div></div>
-            </OpenWrapper>
-          )
-          : (
-            <MenuWrapper key={index}>
-              <TwoInputWithLabel>
+              <div>
+                <label>메뉴 가격</label>
                 <div>
-                  <label>메뉴 이름</label>
-                  <input name="menuName" type="text" onChange={(e)=>{updateMenu(index,"menuName",e.target.value)}} defaultValue={item.menuName} />
+                  <input name="menuPrice" type="number" onChange={(e)=>{updateMenu(index,"menuPrice",e.target.value)}} defaultValue={item.menuPrice} />
+                  <span>원</span>
                 </div>
-                <div>
-                  <label>메뉴 가격</label>
-                  <div>
-                    <input name="menuPrice" type="number" onChange={(e)=>{updateMenu(index,"menuPrice",e.target.value)}} defaultValue={item.menuPrice} />
-                    <span>원</span>
+              </div>
+            </TwoInputWithLabel>
+            <SelectAndInput>
+              <label>원두</label>
+              <div>
+                {[...wonduKind,{name:'사용안함'}].map((it, i) => (
+                  <div key={i} onClick={(e)=>{
+                    e.preventDefault();
+                    updateMenu(index,"wondu",{name:it.name,weight:''});
+                  }} style={{backgroundColor:it.name === item.wondu.name ? 'var(--main-color)' : 'white', color:it.name === item.wondu.name ? 'white' : 'black'}}>
+                    {it.name}
                   </div>
-                </div>
-              </TwoInputWithLabel>
-              <SelectAndInput>
-                <label>원두</label>
-                <div>
-                  {[...wonduKind,{name:'사용안함'}].map((it, i) => (
-                    <div key={i} onClick={(e)=>{
-                      e.preventDefault();
-                      updateMenu(index,"wondu",{name:it.name,weight:''});
-                    }} style={{backgroundColor:it.name === item.wondu.name ? 'var(--main-color)' : 'white', color:it.name === item.wondu.name ? 'white' : 'black'}}>
-                      {it.name}
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <label>1회 사용량</label>
-                  <input name="wonduWeight" type="number" onChange={(e)=>{updateMenu(index,"wondu",{...item.wondu,weight:e.target.value})}} defaultValue={item.wondu.weight} />
-                  <span>g</span>
-                </div>
-              </SelectAndInput>
-              <SelectAndInput>
-                <label>우유</label>
-                <div>
-                  {[...milkKind,{name:'사용안함'}].map((it, i) => (
-                    <div key={i} onClick={(e)=>{
-                      e.preventDefault();
-                      updateMenu(index,"milk",{name:it.name,weight:''});
-                    }} style={{backgroundColor:it.name === item.milk.name ? 'var(--main-color)' : 'white', color:it.name === item.milk.name ? 'white' : 'black'}}>
-                      {it.name}
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <label>1회 사용량</label>
-                  <input name="milkWeight" type="number" onChange={(e)=>{updateMenu(index,"milk",{...item.milk,weight:e.target.value})}} defaultValue={item.milk.weight} />
-                  <span>ml</span>
-                </div>
-              </SelectAndInput>
-              <SelectAndInput>
-                <label>포장재</label>
-                <div>
-                  {pojangjaeKind.map(e=>e.name).map((it, i) => (
-                    <div key={i} onClick={(e)=>{
-                      e.preventDefault();
-                      const newMenu = [...menu];
-                      if(newMenu[index].pojangjae.includes(it)){
-                        newMenu[index].pojangjae = newMenu[index].pojangjae.filter((item)=>item !== it);
-                      }else{
-                        newMenu[index].pojangjae.push(it);
-                      }
-                      setMenu(newMenu);
-                    }} style={{backgroundColor:item.pojangjae.includes(it) ? 'var(--main-color)' : 'white', color:item.pojangjae.includes(it) ? 'white' : 'black'}}>
-                      {it}
-                    </div>
-                  ))}
-                </div>
-              </SelectAndInput>
-              <LabelWithTooltip>
-                추가 재료
-                <div className="material-icons">
-                  help_outline
-                  <div>
-                    <p>재료 이름이나 브랜드명으로 검색하시면 CNT 마트에서 구매 가능한 재료를 찾아드립니다.</p>
-                    <p>단어 단위로 띄어쓰기 하시면 더 많은 검색 결과를 보실 수 있습니다.</p>
+                ))}
+              </div>
+              <div>
+                <label>1회 사용량</label>
+                <input name="wonduWeight" type="number" onChange={(e)=>{updateMenu(index,"wondu",{...item.wondu,weight:e.target.value})}} defaultValue={item.wondu.weight} />
+                <span>g</span>
+              </div>
+            </SelectAndInput>
+            <SelectAndInput>
+              <label>우유</label>
+              <div>
+                {[...milkKind,{name:'사용안함'}].map((it, i) => (
+                  <div key={i} onClick={(e)=>{
+                    e.preventDefault();
+                    updateMenu(index,"milk",{name:it.name,weight:''});
+                  }} style={{backgroundColor:it.name === item.milk.name ? 'var(--main-color)' : 'white', color:it.name === item.milk.name ? 'white' : 'black'}}>
+                    {it.name}
                   </div>
+                ))}
+              </div>
+              <div>
+                <label>1회 사용량</label>
+                <input name="milkWeight" type="number" onChange={(e)=>{updateMenu(index,"milk",{...item.milk,weight:e.target.value})}} defaultValue={item.milk.weight} />
+                <span>ml</span>
+              </div>
+            </SelectAndInput>
+            <SelectAndInput>
+              <label>포장재</label>
+              <div>
+                {pojangjaeKind.map(e=>e.name).map((it, i) => (
+                  <div key={i} onClick={(e)=>{
+                    e.preventDefault();
+                    const newMenu = [...menu];
+                    if(newMenu[index].pojangjae.includes(it)){
+                      newMenu[index].pojangjae = newMenu[index].pojangjae.filter((item)=>item !== it);
+                    }else{
+                      newMenu[index].pojangjae.push(it);
+                    }
+                    setMenu(newMenu);
+                  }} style={{backgroundColor:item.pojangjae.includes(it) ? 'var(--main-color)' : 'white', color:item.pojangjae.includes(it) ? 'white' : 'black'}}>
+                    {it}
+                  </div>
+                ))}
+              </div>
+            </SelectAndInput>
+            <LabelWithTooltip>
+              추가 재료
+              <div className="material-icons">
+                help_outline
+                <div>
+                  <p>재료 이름이나 브랜드명으로 검색하시면 CNT 마트에서 구매 가능한 재료를 찾아드립니다.</p>
+                  <p>단어 단위로 띄어쓰기 하시면 더 많은 검색 결과를 보실 수 있습니다.</p>
                 </div>
-              </LabelWithTooltip>
-              {[...item.recipe.filter(item => item.name !== ''), {"name":"", "volume":"", "unit": ""}].map((it, i) => (
-                <MaterialInput key={i} item={it} setMenu={(item)=>{
-                  const newMenu = [...menu];
-                  newMenu[index].recipe[i] = item;
-                  setMenu(newMenu);
-                }}/>
-              ))}
-            </MenuWrapper>
-          )}
+              </div>
+            </LabelWithTooltip>
+            {[...item.recipe.filter(item => item.name !== ''), {"name":"", "volume":"", "unit": ""}].map((it, i) => (
+              <MaterialInput key={i} item={it} setMenu={(item)=>{
+                const newMenu = [...menu];
+                newMenu[index].recipe[i] = item;
+                setMenu(newMenu);
+              }}/>
+            ))}
+          </MenuWrapper>
         </BorderDiv>)
       )}
       <PlusButton onClick={(e) => {

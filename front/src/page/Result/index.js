@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ContentsWrapper, Title } from '../../components';
-import { BorderSpan, TopInfo, Average, MenuList, Span, H3, H6, H8 } from './components';
+import { BorderSpan, TopInfo, Average } from './components';
 import DetailMenu from "./DetailMenu";
 import axios from 'axios';
 
@@ -10,11 +10,12 @@ export default function () {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [result, setResult] = useState([]);
+    const [curIndex, setCurIndex] = useState(0);
     useEffect(() => {
         const setDefault = async () => {
             try {
                 const response = await axios.get(`/api/report?userId=${searchParams.get('userId')}`);
-                setResult(response);
+                setResult(response.data);
                 setLoading(false);
             } catch (e) {
                 alert('서버에 문제가 있습니다. 다시 시도해주세요.');
@@ -47,7 +48,7 @@ export default function () {
             <Average>
                 <div>
                     <span>평균 마진율</span>
-                    <BorderSpan>66.7% </BorderSpan>
+                    <BorderSpan>{result.allMaginAvg}%</BorderSpan>
                 </div>
                 <span style={{ wordBreak: 'keep-all', fontSize: '0.9rem', color:"#888" }}>
                     모든 메뉴가 동일한 비율로 팔렸다고 가정한 값입니다.
@@ -55,9 +56,9 @@ export default function () {
                     따라서 실제 매출과 차이가 있을 수 있으나, 추후 포스기와 연동하여 정확한 매출을 계산할 수 있도록 개발할 예정입니다.
                 </span>
             </Average>
-            <MenuList>
-                <DetailMenu />
-            </MenuList>
+            {result.menu.map((item, index) => (
+                <DetailMenu key={index} menu={item} index={index} setCurIndex={setCurIndex} curIndex={curIndex} allMaginAvg={result.allMaginAvg} />
+            ))}
         </ContentsWrapper>
     );
 }

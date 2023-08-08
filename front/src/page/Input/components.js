@@ -131,17 +131,16 @@ export const BorderDiv = styled.div`
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 4px;
-    transition: all 0.3s;
 `;
 
 export const MenuWrapper = styled.div`
-    display: flex;
+    display: ${({open})=>open ? 'flex' : 'none'};
     flex-direction: column;
     width: 100%;
 `;
 
 export const OpenWrapper = styled.div`
-    display: flex;
+    display: ${({open})=>open ? 'flex' : 'none'};
     justify-content: space-between;
     width: 100%;
     cursor: pointer;

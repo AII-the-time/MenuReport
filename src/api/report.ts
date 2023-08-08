@@ -89,7 +89,7 @@ const api: FastifyPluginAsync = async (server: FastifyInstance) => {
 
             const name = menu.menuName;
             const price = menu.menuPrice;
-            const profit = price - cost;
+            const profit = Math.round((price - cost)*100)/100;
             const magin = Math.round((profit / price * 100)*100)/100;
 
             return { name, price, magin, profit, pojangjae, recipe };
